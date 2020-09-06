@@ -1,8 +1,36 @@
-from flask import Flask, redirect
-
+from flask import Flask, jsonify
 import random
-
+import csv
+import pandas as pd
+import json
+import jsonpickle
+from json import JSONEncoder
+with open('data.csv') as csvfile:
+     csv_reader= csv.reader(csvfile, delimiter=',')
 app = Flask(__name__)
+def make_json(csvFilePath, jsonFilePath):  
+    data = {}
+    with open(csvFilePath, encoding='utf-8') as csvf: 
+        csvReader = csv.DictReader(csvf) 
+        for rows in csvReader: 
+            key = rows['id'] 
+            data[key] = rows 
+    with open(jsonFilePath, 'w', encoding='utf-8') as jsonf: 
+        jsonf.write(json.dumps(data, indent=4)) 
+csvFilePath = r'data.csv'
+jsonFilePath = r'employee.json'
+make_json(csvFilePath, jsonFilePath)
+with open('employee.json') as f:
+     json_reader= json.load(f)
+range =(1,99)
+for rows in range:
+    data={}
+    key = rows[1]
+    data[key]=rows
+    @app.route('/')
+    def redirect_to_api():
+        return data
+app.run(host="localhost", port=8000)
 
 """
 
@@ -16,7 +44,6 @@ Implement an endpoint `/api/fetch` that returns the contents of `data.csv` as JS
 
 """
 
-# your work here
 
 """
 
@@ -24,14 +51,7 @@ DOCUMENTATION WEBPAGE BELOW
 
 """
 
-
-@app.route("/")
-def redirect_to_api():
-    return redirect("/api", code=301)
-
-@app.route("/api")
-def api_home():
-    return """
+"""
         <style>
             body {
                 font-family: sans-serif;
